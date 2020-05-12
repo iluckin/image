@@ -7,6 +7,7 @@ use ImagickDraw;
 use ImagickPixel;
 use ImagickException;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class Image
@@ -65,22 +66,6 @@ class Image
     public function getImagick()
     {
         return $this->imagick;
-    }
-
-    /**
-     * Open an image
-     *
-     * @param string $path Local image path, or remote url
-     * @return Image
-     * @throws ImagickException
-     */
-    public static function open($path)
-    {
-        if (substr($path, 0, 4) == 'http') {
-            return new self((new HttpClient)->get($path)->getBody(), true);
-        }
-
-        return new self($path, false);
     }
 
     /**
@@ -184,6 +169,23 @@ class Image
             $canvas->setImageDispose($image->getImageDispose());
         }
         $this->imagick = $canvas;
+    }
+
+    /**
+     * Open an image
+     *
+     * @param string $path Local image path, or remote url
+     * @return Image
+     * @throws ImagickException
+     * @throws GuzzleException
+     */
+    public static function open($path)
+    {
+        if (substr($path, 0, 4) == 'http') {
+            return new self((new HttpClient)->get($path)->getBody(), true);
+        }
+
+        return new self($path, false);
     }
 
     /**
